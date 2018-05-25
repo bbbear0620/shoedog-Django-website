@@ -64,8 +64,6 @@
                                 <span class="sr-only">Next</span>
                               </a>
                         </div>
-                        <div id="chart-container" style="width: 600px;height: 400px;margin-top: 10em;align-content: center">
-                        </div>
                     </div>
 
                 </div>
@@ -112,30 +110,5 @@
     </div>
 
     </div>
-    <script>
-         var options={
-          chart:{ type:'line' },
-          title:{ text:null },
-          xAxis:{ categories:{{ dates|safe }},
-                  tickmarkPlacement:'on'
-              },
-          yAxis:{
-                 title:{text:null},
-                 labels:{enable:false},
-                 gridLineDashStyle:'Dash'
-              },
-          series:[{
-                   name:'readnum',
-                   data:{{ read_nums }}
-              }],
-          plotOptions:{
-              line:{dataLabels:{enabled:true}}
-          },
-          legend:{enable:false},
-          credits:{enable:false}
-        };
-        var chart = Highcharts.chart('chart-container',options);
-    </script>
-
 
 {% endblock %}

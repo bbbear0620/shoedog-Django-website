@@ -23,8 +23,9 @@
                             {% for activity in page_of_news.object_list %}
                                 <li class="thumbnail">
                                     <p class="activity-title">{{ activity.name }}</p>
-                                    <p>{{ activity.start_time }}</p>
-                                    <p>{{ activity.end_time }}</p>
+                                    <hr>
+                                    <span>From:</span><span>{{ activity.start_time }}</span>&nbsp;&nbsp;To:<span>{{ activity.end_time }}</span>
+                                    <hr>
                                     <button class="btn btn-info" id="closedetail{{ activity.id }}" onclick="showdiv({{ activity.id }});" >&nbsp;Know More&nbsp;</button>
                                     <div id="showdetail{{ activity.id }}" class="content" style="display: none" >
                                         <p>{{ activity.detail }}</p>
