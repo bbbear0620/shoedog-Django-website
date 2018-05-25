@@ -101,3 +101,6 @@ def mylogout(request):
 def userprofile(request):
     context = {}
     return render(request,'userprofile.html',context)
+
+def nothingbuttest(request):
+    pass
