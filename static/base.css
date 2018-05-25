@@ -1,0 +1,31 @@
+body,*{
+    margin: 0;
+    padding: 0;
+}
+div.navbar-default{
+    background-color: #ac2925;
+}
+div.container-fluid a.linktext{
+    color: white;
+}
+ul.nav li a.linktext{
+    color: white;
+}
+
+body{
+    margin-top: 80px!important;
+}
+
+ul{
+    list-style-type: none;
+}
+
+footer.main-footer{
+    padding-top: 50px;
+    padding-bottom: 50px;
+    margin-top: 100px;
+    border-top: black;
+    color: #99979c;
+    text-align: center;
+    background-color: darkred;
+}

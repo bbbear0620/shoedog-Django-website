@@ -1,0 +1,18 @@
+h3.home-content{
+    font-size: 222%;
+    text-align: center;
+    margin-top: 4em;
+    margin-bottom: 2em;
+}
+
+div#container{
+    margin: 0 auto;
+}
+
+div.hot-data{
+    text-align: center;
+    margin-top: 2em;
+}
+a.hot-link{
+    color: black;
+}

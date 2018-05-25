@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}news list{% endblock %}
+
+{% block newsactive %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load primal_pic_tag %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'news/news.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        {% block news_list_title %}News{% endblock %}
+                    </div>
+                    <div class="panel-body">
+                        {% for news in page_of_news.object_list %}
+                            <div class="news">
+                                <h3><a href="{% url 'news_detail' news.pk %}">{{ news.title }}</a></h3>
+                                <p class="news-info">
+                                    <span class="glyphicon glyphicon-tag"><a href="{% url 'news_type_list' news.news_type.pk %}">{{ news.news_type }}</a></span>
+                                    <span class="glyphicon glyphicon-calendar">{{ news.created_time|date:'Y-m-d' }}</span>
+                                    <img src="{% get_primal_pic news %}" style="height: 35%;width: 50%;display:block;">
+                                </p>
+                            </div>
+                        {% empty %}
+                            <div class="news">
+                                <h3>暂无内容</h3>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="page-bar">
+                    <div aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li>
+                                {% if page_of_news.has_previous  %}
+                                    <a href="?page={{ page_of_news.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                {% else %}
+                                    <span aria-hidden="true">&laquo;</span>
+                                {% endif %}
+                            </li>
+                            {% for page_num in page_range%}
+                                {% if page_num == page_of_news.number %}
+                                    <li class="active"><span>{{ page_num }}</span></li>
+                                {% else %}
+                                    {% if  page_num  == '...'  %}
+                                        <li><span>{{ page_num }}</span></li>
+                                    {% else %}
+                                        <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+                                    {% endif %}
+
+                                {% endif %}
+                            {% endfor %}
+                            <li>
+                                {% if page_of_news.has_next %}
+                                    <a href="?page={{ page_of_news.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                {% else %}
+                                    <span aria-hidden="true">&raquo;</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                        <p>
+                            一共有{{ page_of_news.paginator.count }}篇
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4 col-md-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3>News Type</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="news-type">
+                            {% for type in news_types %}
+                                <li>
+                                    <a href="{% url 'news_type_list' type.pk %}">
+                                        {{ type.type_name }}({{ type.news_count }})
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li>暂无分类</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3>时间归档</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="news-date">
+                            {% for news_date in news_dates %}
+                                <a href="{% url 'news_date_list' news_date.year news_date.month %}">
+                                    <li>{{ news_date|date:'Y-m' }}</li>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

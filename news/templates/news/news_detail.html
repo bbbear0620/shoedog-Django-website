@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'news/news.css' %}">
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                <h2>{{ news.title }}</h2>
+                <ul class="news-info-description">
+                    <li>作者:{{ news.author }}</li>&nbsp&nbsp
+                    <li>发表日期:{{ news.created_time|date:"Y-m-d" }}</li>&nbsp&nbsp
+                    <li>分类:<a href="{% url 'news_type_list' news.news_type.pk %}">{{ news.news_type }}</a></li>&nbsp&nbsp
+                    <li>阅读数({{ news.get_read_num }})</li>&nbsp&nbsp
+                    <li>评论数({% get_comment_count news %})</li>
+                    <li class="like" onclick="likechange(this,'anews',{{ news.pk }})">
+                        <span class="like-flag glyphicon glyphicon-thumbs-up {% get_like_status news %}"></span>
+                        <span class="liked-num">{% get_like_count news %}</span>
+                    </li>
+                </ul>
+                <hr style="color: darkred">
+
+                <!---滑窗--->
+                <div id="my-carousel" class="carousel slide" data-ride="carousel" style="display: inline-block;padding-bottom: 20px">
+                      <!-- Indicators -->
+                      <ol class="carousel-indicators">
+                          {% for i in image_list %}
+                              {% if  i == 0 %}
+                                  <li data-target="#my-carousel" data-slide-to="{{ i }}" class="active"></li>
+                              {% else %}
+                                  <li data-target="#my-carousel" data-slide-to="{{ i }}"></li>
+                              {% endif %}
+                          {% endfor %}
+                      </ol>
+                      <!-- Wrapper for slides -->
+                      <div class="carousel-inner" role="listbox">
+                          {% for i,j in images %}
+                              {% if i == 0 %}
+                                  <div class="item active">
+                                    <img src="{{ j.image.url }}" width="100%" height="100%">
+                                  </div>
+                              {% else %}
+                                  <div class="item">
+                                    <img src="{{ j.image.url }}" width="100%" height="100%">
+                                  </div>
+                              {% endif %}
+                          {% endfor %}
+                      </div>
+                      <!-- Controls -->
+                      <a class="left carousel-control" href="#my-carousel" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                      </a>
+                      <a class="right carousel-control" href="#my-carousel" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                      </a>
+                </div>
+                <div class="news-content">{{ news.content|safe }}</div>
+                <div class="news-more">
+                    <span>previous:
+                        {% if previous_news %}
+                            <a href="{% url 'news_detail' previous_news.pk %}">{{ previous_news.title }}</a>
+                        {% else %}
+                            none
+                        {% endif %}
+                    </span>
+                    <span style="display: block">next:
+                        {% if next_news %}
+                            <a href="{% url 'news_detail' next_news.pk %}">{{ next_news.title }}</a>
+                        {% else %}
+                            none
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                <div class="submit-comment">
+                    <h4>submit-comment</h4>
+                    {% if user.is_authenticated %}
+                        <form id='comment-form' action="{% url 'update_comment' %}" method="post" style="overflow: hidden">
+                            <label>already login:{{ user.username }}</label>
+                            <div id="reply_content_container" style="display: none;">
+                                <p>回复：</p>
+                                <div id="reply_content" style="padding-left: 2em"></div>
+                            </div>
+                            {% csrf_token %}
+                            {% for field in comment_form %}
+                                {{ field }}
+                            {% endfor %}
+                            <span id="comment_error" class="text-danger pull-right" style="margin-top: 1em"></span>
+                            <div><input type="submit" value="submit" class="btn btn-primary" style="float: left;margin-top:1em"></div>
+                        </form>
+                    {% else %}
+                        not login yet
+                        <a href="{% url 'login' %}?from={{ request.get_full_path }}" class="btn btn-primary">login</a>
+                        <a href="{% url 'register' %}?from={{ request.get_full_path }}" class="btn btn-danger">register</a>
+                    {% endif %}
+                </div>
+
+                <div class="comment-list">
+                    <h4>comment-list</h4>
+                    <div id="comment-list-detail">
+                        {% for comment in comments %}
+                        <div id="root_{{ comment.pk }}" class="comment">
+                            <span>{{ comment.user }}</span>
+                            <span>({{ comment.comment_time|date:"Y-m-d H:i:s" }}):</span>
+                            <div id="comment_{{ comment.pk }}">
+                                {{ comment.text|safe }}
+                            </div>
+                            <a href="javascript:reply({{ comment.pk }})">回复</a>
+
+
+                            {% for reply in comment.root_comment.all %}
+                                <div class="reply">
+                                    <span>{{ reply.user.username }}</span>
+                                    <span>({{ reply.comment_time|date:"Y-m-d H:i:s" }})</span>
+                                    <span>回复</span>
+                                    <span>{{ reply.reply_to.username }}:</span>
+                                    <div id="comment_{{ reply.pk }}">
+                                        {{ reply.text|safe }}
+                                    </div>
+                                    <a href="javascript:reply({{ reply.pk }})">回复</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% empty %}
+                            <span id="none_comment">there is no comment yet</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="login_alert" tabindex="-1" role="dialog" >
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form id='modal_login_form' action='' method="POST">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Login</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {% for field in loginform %}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                        {% endfor %}
+                        <span id='login_modal_alert' class="text-danger"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block script_extends %}
+    <script type="text/javascript">
+        function reply(reply_comment_id) {
+                $('#reply_comment_id').val(reply_comment_id);
+                var html = $('#comment_'+reply_comment_id).html();
+                $('#reply_content').html(html);
+                $('#reply_content_container').show();
+                $('html').animate({scrollTop:$('#comment-form').offset().top-60},300,function () {
+                    CKEDITOR.instances['id_text'].focus()});
+            }
+        function numberformat(num){
+            return ('00'+num).substr(-2);
+        }
+        function timeformat(timestamp) {
+            var datetime = new Date(timestamp*1000);
+            var year = datetime.getFullYear();
+            var month = numberformat(datetime.getMonth()+1);
+            var day = numberformat(datetime.getDate());
+            var hour = numberformat(datetime.getHours());
+            var minute = numberformat(datetime.getMinutes());
+            var second = numberformat(datetime.getSeconds());
+            return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
+        }
+        $("#comment-form").submit(function () {
+            //判断是否为空
+            $("#comment_error").text('');
+            CKEDITOR.instances['id_text'].updateElement();
+            //异步提交，阻止comment-form提交时直接刷新页面
+            $.ajax({
+                url:"{% url 'update_comment' %}",
+                type:'POST',
+                data:$(this).serialize(),//this = #comment-form
+                cache:false,
+                success:function (data) {
+                    //console.log(data);
+                    if(data['status']=="SUCCESS"){
+                        //插入数据
+                       if($('#reply_comment_id').val()=='0'){
+                            //插入评论
+                           var comment_html = '<div id="root_'+
+                                            data['pk']+'" class="comment"><span>'+
+                                            data['username']+'</span><span>('+
+                                            timeformat(data['comment_time'])+'):</span><div id="comment_'+
+                                            data['pk']+'">'+
+                                            data['text']+'</div><a href="javascript:reply('+
+                                            data['pk']+')">回复</a></div>';
+                           $("#comment-list-detail").prepend(comment_html);
+                        }
+                        else{
+                            //插入回复
+                           var reply_html = '<div class="reply"> <span>'+
+                                               data['username']+'</span> <span>('+
+                                               timeformat(data['comment_time'])+')</span> <span>回复</span> <span>'+
+                                               data['reply_to']+':</span> <div id="comment_'+
+                                               data['pk']+'">'+
+                                               data['text']+' </div> <a href="javascript:reply('+
+                                               data['pk']+')">回复</a> </div>';
+                           $("#root_"+data['root_pk']).append(reply_html)
+                        }
+
+                        CKEDITOR.instances['id_text'].setData('');
+                        $('#reply_content_container').hide();
+                        $('#reply_comment_id').val('0');
+                        $('#none_comment').remove();
+                    }
+                    else {
+                        // 显示错误信息
+                        $("#comment_error").text(data['message']);
+                    }
+                },
+                error:function(xhr) {
+                    console.log(xhr);
+                }
+            });
+            return false
+        });//jquery中的选择器
+        function likechange(obj,content_type,object_id){
+            var is_like = obj.getElementsByClassName('active').length == 0;
+            $.ajax({
+                url:"{% url 'like_change' %}",
+                type:'GET',
+                data:{
+                    content_type:content_type,
+                    object_id:object_id,
+                    is_like:is_like
+                },
+                cache:false,
+                success:function (data) {
+                    console.log(data)
+                    if(data['status']=='SUCCESS'){
+                        //更新点赞状态
+                        var status_element =$(obj.getElementsByClassName('like-flag'));
+                        if(is_like){
+                            status_element.addClass('active')
+                        }
+                        else{
+                            status_element.removeClass('active')
+                        }
+                        //更新点赞数量
+                        var num_element = $(obj.getElementsByClassName('liked-num'));
+                        num_element.text(data['liked_num']);
+                    }
+                    else{
+                        if(data['code']==400){
+                            $('#login_alert').modal('show')
+                        }
+                        else {
+                            alert(data['message'])
+                        }
+                    }
+                },
+                error:function (xhr) {
+                    console.log(xhr)
+                }
+            })   
+        }
+        $("#modal_login_form").submit(function (event) {
+            event.preventDefault();
+            $('#login_modal_alert').text('');
+            $.ajax({
+                url:'{% url 'modal_login' %}',
+                type:'POST',
+                data:$(this).serialize(),
+                cache:false,
+                success:function (data) {
+                    if(data['status']=='SUCCESS'){
+                        window.location.reload();
+                    }
+                    else{
+                        $('#login_modal_alert').text('username or password error')
+                    }
+                }
+            })
+        })
+    </script>
+
+{% endblock %}
