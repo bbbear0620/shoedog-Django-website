@@ -25,10 +25,10 @@
                                     <p class="activity-title">{{ activity.name }}</p>
                                     <p>{{ activity.start_time }}</p>
                                     <p>{{ activity.end_time }}</p>
-                                    <button id="closedetail{{ activity.id }}" onclick="showdiv({{ activity.id }});" > Know More </button>
+                                    <button class="btn btn-info" id="closedetail{{ activity.id }}" onclick="showdiv({{ activity.id }});" >&nbsp;Know More&nbsp;</button>
                                     <div id="showdetail{{ activity.id }}" class="content" style="display: none" >
                                         <p>{{ activity.detail }}</p>
-                                        <button class="button bg-info" onclick="hidediv({{ activity.id }});" href="#"> Close </button>
+                                        <button class="btn btn-danger" onclick="hidediv({{ activity.id }});" href="#">&nbsp;Close&nbsp;</button>
                                     </div>
                                 </li>
                             {% empty %}
