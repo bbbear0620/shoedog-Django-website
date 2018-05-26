@@ -25,7 +25,7 @@ SECRET_KEY = 'wnt%f7tpvc+z52-+&jzx9&7#mx3_!5#*#9rng-8khgw(8_4-o8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['bearcat22.pythonanywhere.com']
+ALLOWED_HOSTS = ['bearcat22.pythonanywhere.com','dullbear.pythonanywhere.com']
 
 
 # Application definition
