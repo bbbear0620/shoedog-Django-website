@@ -43,6 +43,7 @@ def like_change(request):
             if count_created:
                 like_count.like_num += 1
                 like_count.save()
+                #do nothing
             else:
                 like_count.like_num = 1
                 like_count.save()
