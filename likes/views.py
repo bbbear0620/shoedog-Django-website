@@ -39,9 +39,13 @@ def like_change(request):
         like_record,record_created= LikeRecord.objects.get_or_create(content_type=content_type,object_id=object_id,user=user)
         if record_created:
             #新增点赞数据
-            like_count,count_created = LikesAllCount.objects.get_or_create(content_type=content_type,object_id=object_id,like_num=0)
-            like_count.like_num += 1
-            like_count.save()
+            like_count,count_created = LikesAllCount.objects.get_or_create(content_type=content_type,object_id=object_id)
+            if count_created:
+                like_count.like_num += 1
+                like_count.save()
+            else:
+                like_count.like_num = 1
+                like_count.save()
             return SuccessResponse(like_count.like_num)
         else:
             return ErrorResponse(402,'you were liked')
