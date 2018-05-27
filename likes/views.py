@@ -41,11 +41,11 @@ def like_change(request):
             #新增点赞数据
             like_count,count_created = LikesAllCount.objects.get_or_create(content_type=content_type,object_id=object_id)
             if count_created:
-                like_count.like_num += 1
+                like_count.like_num = 1
                 like_count.save()
                 #do nothing
             else:
-                like_count.like_num = 1
+                like_count.like_num += 1
                 like_count.save()
             return SuccessResponse(like_count.like_num)
         else:
