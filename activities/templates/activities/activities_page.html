@@ -24,7 +24,7 @@
                                 <li class="thumbnail">
                                     <p class="activity-title">{{ activity.name }}</p>
                                     <hr>
-                                    <span>From:</span><span>{{ activity.start_time }}</span>&nbsp;&nbsp;To:<span>{{ activity.end_time }}</span>
+                                    <span>From:</span><span style="text-emphasis: #761c19">{{ activity.start_time }}</span>&nbsp;&nbsp;To:<span>{{ activity.end_time }}</span>&nbsp;&nbsp;Location:{{ activity.palace }}
                                     <hr>
                                     <button class="btn btn-info" id="closedetail{{ activity.id }}" onclick="showdiv({{ activity.id }});" >&nbsp;Know More&nbsp;</button>
                                     <div id="showdetail{{ activity.id }}" class="content" style="display: none" >
